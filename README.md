@@ -46,3 +46,11 @@ Sharity simplifies the process of stock market analysis by providing:
    ```bash
    git clone https://github.com/Luvyansh/Sharity.git
    cd Sharity
+
+2. **Activate virtual environment:**
+   ```bash
+   venv/Scripts/activate
+
+3. **Run the Flask App:**
+   ```bash
+   python main.py
