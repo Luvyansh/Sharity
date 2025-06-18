@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Stock Details{% endblock %}
+
+{% block body %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+
+<div class="container my-5" style="width: 90%; max-width: 100%; background-color: transparent; border-radius: 0;">
+    <div class="d-flex flex-row gap-3 align-items-start flex-wrap">
+        <!-- Left Panel -->
+        <div style="flex: 0 0 200px; color: #f0f0f0;">
+            <!-- Current Price Box -->
+            <div style="background-color: #d9d9d9; padding: 20px; border-radius: 8px; height: 165px; margin-bottom: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                <p class="mb-2" style="color: black;">Current Price:</p>
+                <h3 style="color: black;">${{ stock.price }}</h3>
+            </div>
+            <!-- Predictions Box -->
+            <div style="background-color: #d9d9d9; padding: 20px; border-radius: 8px; height: 165px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <p class="mb-2" style="color: black;">Predictions:</p>
+                <button class="btn btn-success" onclick="predictStock('{{ stock.symbol }}')" style="font-weight: bold; padding: 5px 20px; border-radius: 20px;"> Predict </button>
+                <div id="inline-loader-wrapper" class="inline-loader-wrapper" style="display: none; margin-top: 10px; height: 30px;">
+                    <div class="loader" style="transform: scale(0.6);">
+                        <div class="loader__bar"></div>
+                        <div class="loader__bar"></div>
+                        <div class="loader__bar"></div>
+                        <div class="loader__bar"></div>
+                        <div class="loader__bar"></div>
+                        <div class="loader__ball"></div>
+                    </div>
+                </div>
+                <div id="prediction-result" style="margin-top: 10px; font-weight: bold; font-size: 18px; min-height: 24px;"></div>
+            </div>
+        </div>
+
+        <!-- Right Panel (Chart) -->
+        <div style="flex: 1 1 600px; background-color: #d9d9d9; padding: 20px; border-radius: 8px; height: 400px; position: relative;">
+            <button onclick="priceChart.resetZoom()" class="btn btn-sm btn-primary" style="position: absolute; top: 10px; right: 10px;">Reset Zoom</button>
+            <canvas id="priceChart" style="width: 100%; height: 100%;"></canvas>
+        </div>
+    </div>
+
+    <!-- News Table -->
+    {% if news %}
+    <div class="mt-5">
+        <h4 style="color: #f0f0f0;">Top News Articles for {{ stock.symbol }}</h4>
+        <div style="overflow-x: auto;">
+            <table class="table table-striped table-dark mt-3">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Source</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in news %}
+                    <tr>
+                        <td>{{ article.title }}</td>
+                        <td>{{ article.source }}</td>
+                        <td><a href="{{ article.url }}" target="_blank" class="btn btn-sm btn-outline-info">Read</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    const priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ labels | tojson }},
+            datasets: [{
+                label: {{ (stock.symbol + " Price") | tojson }},
+                data: {{ prices | tojson }},
+                fill: false,
+                borderColor: 'rgba(139, 69, 69, 0.7)',
+                tension: 0.3,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 90,
+                        minRotation: 45
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                    },
+                    zoom: {
+                        pinch: { enabled: true },
+                        wheel: { enabled: true },
+                        mode: 'x'
+                    }
+                }
+            }
+        }
+    });
+
+    window.priceChart = priceChart;
+});
+
+function predictStock(symbol) {
+    const loader = document.getElementById("inline-loader-wrapper");
+    const resultEl = document.getElementById("prediction-result");
+
+    resultEl.innerText = "";
+    loader.style.display = "flex";
+    loader.classList.remove("fade-out");
+
+    fetch(`/predict/${symbol}`)
+        .then(response => response.json())
+        .then(data => {
+            const predictionText = document.createElement("span");
+            predictionText.style.fontWeight = "bold";
+
+            if (data.prediction === "BUY") {
+                predictionText.style.color = "green";
+            } else if (data.prediction === "SELL") {
+                predictionText.style.color = "red";
+            } else {
+                predictionText.style.color = "black";
+            }
+
+            predictionText.textContent = data.prediction;
+
+            resultEl.innerHTML = "";
+            resultEl.appendChild(predictionText);
+        })
+        .catch(error => {
+            console.error("Prediction failed:", error);
+            resultEl.innerText = "Prediction failed.";
+        })
+        .finally(() => {
+            loader.classList.add("fade-out");
+            setTimeout(() => loader.style.display = "none", 400);
+        });
+}
+</script>
+
+{% endblock %}

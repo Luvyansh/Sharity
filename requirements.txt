@@ -1,0 +1,15 @@
+Flask
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+gunicorn
+yfinance
+Flask-SQLAlchemy
+flask-cors
+Flask-Migrate
+Flask-Bcrypt
+Flask-JWT-Extended
+Plotly
+python-dotenv
