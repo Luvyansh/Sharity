@@ -64,7 +64,7 @@ Sharity simplifies the process of stock market analysis by providing:
    ```bash
    ALPHA_VANTAGE_API_KEY = "your api key"
    ```
-   to a `.env` file or directly into the config if preferred.
+   to a `.env` file ad save it in the root of the application ``Sharity/`` folder.
 
 6. **Run the Flask app:**
    ```bash
