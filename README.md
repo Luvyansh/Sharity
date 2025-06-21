@@ -60,14 +60,18 @@ Sharity simplifies the process of stock market analysis by providing:
    ```
 
 4. **Important for AlphaVantage - Set your API key for Alpha Vantage:**
-   Add your API key (eg. ALPHA_VANTAGE_API_KEY = "your api key") to a `.env` file or directly into the config if preferred.
+   Add your API key
+   ```bash
+   ALPHA_VANTAGE_API_KEY = "your api key"
+   ```
+   to a `.env` file or directly into the config if preferred.
 
-5. **Run the Flask app:**
+6. **Run the Flask app:**
    ```bash
    flask run
    ```
 
-6. **Access the app:**
+7. **Access the app:**
    Open your browser and navigate to `http://127.0.0.1:5000`
 
 ---
