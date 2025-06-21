@@ -59,8 +59,8 @@ Sharity simplifies the process of stock market analysis by providing:
    pip install -r requirements.txt
    ```
 
-4. **Set your API key for Alpha Vantage:**
-   Add your API key to a `.env` file or directly into the config if preferred.
+4. **Important for AlphaVantage - Set your API key for Alpha Vantage:**
+   Add your API key (eg. ALPHA_VANTAGE_API_KEY = "your api key") to a `.env` file or directly into the config if preferred.
 
 5. **Run the Flask app:**
    ```bash
